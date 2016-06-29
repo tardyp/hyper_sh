@@ -1,9 +1,11 @@
 import argparse
 
+from api import Hyper
+
 
 def do_up(args):
-    print "up"
-    pass
+    h = args.hyper
+    print h.list_containers().json()
 
 
 def do_down(args):
@@ -18,7 +20,7 @@ def do_rm(args):
 
 def main():
     parser = argparse.ArgumentParser(description='deploy docker-compose files into hyper')
-    parser.add_argument('--config', dest='config', action='store',
+    parser.add_argument('--config', dest='config', action='store', default="~/.hyper/config.json",
                         help='config file with creds to access hyper api (made through hyper config)')
 
     subparsers = parser.add_subparsers(help='sub-command help')
@@ -33,4 +35,5 @@ def main():
     parser_rm.set_defaults(func=do_rm)
 
     args = parser.parse_args()
+    args.hyper = Hyper(config=args.config)
     return args.func(args)
