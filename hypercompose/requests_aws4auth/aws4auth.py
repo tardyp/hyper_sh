@@ -22,13 +22,13 @@ authentication with the Requests module.
 
 from __future__ import unicode_literals
 
+import binascii
 import datetime
 import hashlib
 import hmac
 import posixpath
 import re
 import shlex
-import binascii
 
 from requests.auth import AuthBase
 
@@ -565,7 +565,7 @@ class AWS4Auth(AuthBase):
         if 'Content-Type' not in headers:
             headers["Content-Type"] = "application/json"
         if 'host' not in headers:
-            headers['host'] = urlparse(req.url).netloc.split('?')[0]
+            headers['host'] = urlparse(req.url).netloc.split(':')[0]
         # Aggregate for upper/lowercase header name collisions in header names,
         # AMZ requires values of colliding headers be concatenated into a
         # single header with lowercase name.  Although this is not possible with
