@@ -21,10 +21,6 @@ DockerService = service.Service
 
 class HyperService(DockerService):
 
-#    def ensure_image_exists(self, do_build=None):
-#        """Hyper does not support image push pull. Its done automatically at container creation"""
-#        return
-
     def _get_container_create_options(
             self,
             override_options,

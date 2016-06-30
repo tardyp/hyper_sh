@@ -1,6 +1,5 @@
 import json
 import os
-import pprint
 import urlparse
 
 from docker import Client
