@@ -28,6 +28,7 @@ import hmac
 import posixpath
 import re
 import shlex
+import binascii
 
 from requests.auth import AuthBase
 
@@ -186,7 +187,7 @@ class AWS4Auth(AuthBase):
                             supplied directly on the command line
 
     """
-    default_include_headers = ['host', 'content-type', 'date', 'x-hyper-*']
+    default_include_headers = ['content-type', 'host', 'content-type', 'date', 'x-hyper-*']
 
     def __init__(self, *args, **kwargs):
         """
@@ -299,6 +300,7 @@ class AWS4Auth(AuthBase):
         to setting store_secret_key to True for new key.
 
         """
+        region = "us-west-1"
         if secret_key is None and (self.signing_key is None or
                                    self.signing_key.secret_key is None):
             raise NoSecretKeyError
@@ -376,6 +378,7 @@ class AWS4Auth(AuthBase):
         auth_str += 'SignedHeaders={}, '.format(signed_headers)
         auth_str += 'Signature={}'.format(sig)
         req.headers['Authorization'] = auth_str
+        req.headers['Content-Type'] = 'application/json'
         return req
 
     @classmethod
@@ -521,7 +524,7 @@ class AWS4Auth(AuthBase):
 
         """
         url = urlparse(req.url)
-        path = self.amz_cano_path(url.path)
+        path = self.amz_cano_path(url.path[1:])
         # AWS handles "extreme" querystrings differently to urlparse
         # (see post-vanilla-query-nonunreserved test in aws_testsuite)
         split = req.url.split('?', 1)
@@ -559,8 +562,10 @@ class AWS4Auth(AuthBase):
         # Temporarily include the host header - AWS requires it to be included
         # in the signed headers, but Requests doesn't include it in a
         # PreparedRequest
+        if 'Content-Type' not in headers:
+            headers["Content-Type"] = "application/json"
         if 'host' not in headers:
-            headers['host'] = urlparse(req.url).netloc.split(':')[0]
+            headers['host'] = urlparse(req.url).netloc.split('?')[0]
         # Aggregate for upper/lowercase header name collisions in header names,
         # AMZ requires values of colliding headers be concatenated into a
         # single header with lowercase name.  Although this is not possible with
