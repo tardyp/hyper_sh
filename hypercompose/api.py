@@ -7,7 +7,7 @@ from requests import Session
 
 from dictns import Namespace
 
-from .requests_aws4auth import AWS4Auth
+from requests_aws4auth import AWS4Auth
 
 try:
     import httplib
@@ -49,7 +49,7 @@ class Hyper(Session):
     def get(self, *a, **kw):
         r = Session.get(self, *a, **kw)
         r.raise_for_status()
-        return Namespace(r.json)
+        return Namespace(r.json())
 
     def list_containers(self):
-        return self.get(self.url + "/containers/json")
+        return self.get(self.url + "/v1.23/containers/json", verify=False)

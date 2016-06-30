@@ -5,7 +5,7 @@ from api import Hyper
 
 def do_up(args):
     h = args.hyper
-    print h.list_containers().json()
+    print h.list_containers()
 
 
 def do_down(args):
@@ -37,3 +37,5 @@ def main():
     args = parser.parse_args()
     args.hyper = Hyper(config=args.config)
     return args.func(args)
+
+if  __name__ =='__main__':main()
