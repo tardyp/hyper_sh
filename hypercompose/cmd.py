@@ -1,4 +1,4 @@
-from compose import service
+from compose import service, volume
 
 from api import Hyper
 
@@ -17,11 +17,13 @@ def project_from_options(project_dir, options):
 # we must do it before importing compose.cli
 
 DockerService = service.Service
+
+
 class HyperService(DockerService):
 
-    def ensure_image_exists(self, do_build=None):
-        """Hyper does not support image push pull. Its done automatically at container creation"""
-        return
+#    def ensure_image_exists(self, do_build=None):
+#        """Hyper does not support image push pull. Its done automatically at container creation"""
+#        return
 
     def _get_container_create_options(
             self,
@@ -29,24 +31,39 @@ class HyperService(DockerService):
             number,
             one_off=False,
             previous_container=None):
-        options = DockerService._get_container_create_options(self, override_options,
+        options = DockerService._get_container_create_options(self, override_options, number,
                                                               one_off, previous_container)
-        del options['volumes']
+        del options['networking_config']
+        options['host_config']['Binds'] = map(lambda x: x.replace(":rw", ""), options['host_config']['Binds'])
         return options
 
-    def config_dict(self):
-        return {
-            'options': self.options,
-            'links': self.get_link_names(),
-            'net': self.network_mode.id,
-            'networks': self.networks,
-            'volumes_from': [
-                (v.source.name, v.mode)
-                for v in self.volumes_from if isinstance(v.source, Service)
-            ],
-        }
+    def image(self):
+        try:
+            images = self.client.images(self.image_name)
+            if len(images) != 1:
+                raise service.NoSuchImageError("Image '{}' not found".format(self.image_name))
+            return images[0]
+        except service.APIError as e:
+            if e.response.status_code == 404 and e.explanation and 'No such image' in str(e.explanation):
+                raise service.NoSuchImageError("Image '{}' not found".format(self.image_name))
+            else:
+                raise
+
+    def connect_container_to_networks(self, container):
+        pass
 
 service.Service = HyperService
+
+
+def build_container_name(project, service, number, one_off=False):
+    bits = [project, service]
+    if one_off:
+        bits.append('run')
+    return ''.join(bits + [str(number)])
+
+service.build_container_name = build_container_name
+
+volume.full_name = lambda self: self.name
 
 
 def get_client(environment, verbose=False, version=None, tls_config=None, host=None):
@@ -69,6 +86,7 @@ def main():
             "Options:\n", "Options:\n" + additional_options)
 
     command.get_client = get_client
+
     orig_project_from_options = command.project_from_options
     command.project_from_options = project_from_options
     composemain.TopLevelCommand = TopLevelCommand

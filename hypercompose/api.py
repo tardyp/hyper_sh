@@ -25,11 +25,3 @@ class Hyper(Client):
     def create_network(*arg, **kw):
         #ignore network creation
         pass
-
-    # hack to log the requests
-    def _set_request_timeout(self, kwargs):
-        """Prepare the kwargs for an HTTP request by inserting the timeout
-        parameter, if not already present."""
-        pprint.pprint(kwargs)
-        kwargs.setdefault('timeout', self.timeout)
-        return kwargs
