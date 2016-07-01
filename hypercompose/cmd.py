@@ -31,6 +31,10 @@ class HyperService(DockerService):
                                                               one_off, previous_container)
         del options['networking_config']
         options['host_config']['Binds'] = map(lambda x: x.replace(":rw", ""), options['host_config']['Binds'])
+        if number > 1:
+            options['hostname'] = self.name + str(self.number)
+        else:
+            options['hostname'] = self.name
         return options
 
     def image(self):
@@ -59,7 +63,7 @@ def build_container_name(project, service, number, one_off=False):
 
 service.build_container_name = build_container_name
 
-volume.full_name = lambda self: self.name
+volume.Volume.full_name = property(lambda self: self.name)
 
 
 def get_client(environment, verbose=False, version=None, tls_config=None, host=None):

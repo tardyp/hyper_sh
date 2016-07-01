@@ -7,6 +7,14 @@ Command line utility which installs docker-compose application into the hyper.sh
 As Hyper is (loosly) based on the docker-api, we can re-use docker-compose and docker-py, but hack out the network part to use the authentication stuff from hyper
 
 
+POC
+===
+
+This project is more a PoC. Some features of docker-compose are not working
+
+- Networking configuration
+- container re-creation (they need to be removed, and the created again)
+
 How to use
 ===========
 
