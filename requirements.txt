@@ -3,7 +3,6 @@ cached-property==1.3.0
 certifi==2016.2.28
 cffi==1.7.0
 cryptography==1.4
-dictns==1.4
 docker-compose==1.7.1
 docker-py==1.9.0rc2
 dockerpty==0.4.1
