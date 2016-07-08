@@ -9,7 +9,10 @@ from .requests_aws4auth import AWS4Auth
 
 class Hyper(Client):
     def __init__(self, config):
-        self.config = json.load(open(os.path.expanduser(config)))
+        if isinstance(config, basestring):
+            self.config = json.load(open(os.path.expanduser(config)))
+        else:
+            self.config = config
         clouds = self.config['clouds'].items()
         if len(clouds) != 1:
             raise RuntimeError("supports only one cloud in config")
