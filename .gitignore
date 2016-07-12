@@ -1,3 +1,7 @@
+build
+dist
+AUTHORS
+ChangeLog
 *.pyc
 *.egg-info
 *.egg
