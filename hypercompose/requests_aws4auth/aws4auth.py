@@ -379,6 +379,8 @@ class AWS4Auth(AuthBase):
         auth_str += 'Signature={}'.format(sig)
         req.headers['Authorization'] = auth_str
         req.headers['Content-Type'] = 'application/json'
+        req.headers['host'] = urlparse(req.url).netloc.split(':')[0]
+
         return req
 
     @classmethod
