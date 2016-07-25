@@ -20,15 +20,9 @@ DockerService = service.Service
 
 
 class HyperService(DockerService):
-
-    def _get_container_create_options(
-            self,
-            override_options,
-            number,
-            one_off=False,
-            previous_container=None):
-        options = DockerService._get_container_create_options(self, override_options, number,
-                                                              one_off, previous_container)
+    def _get_container_create_options(self, override_options, number, one_off=False, previous_container=None):
+        options = DockerService._get_container_create_options(self, override_options, number, one_off,
+                                                              previous_container)
         del options['networking_config']
         options['host_config']['Binds'] = map(lambda x: x.replace(":rw", ""), options['host_config']['Binds'])
         if number > 1:
@@ -52,6 +46,7 @@ class HyperService(DockerService):
     def connect_container_to_networks(self, container):
         pass
 
+
 service.Service = HyperService
 
 
@@ -60,6 +55,7 @@ def build_container_name(project, service, number, one_off=False):
     if one_off:
         bits.append('run')
     return ''.join(bits + [str(number)])
+
 
 service.build_container_name = build_container_name
 
@@ -81,8 +77,7 @@ def main():
     global orig_project_from_options
 
     class TopLevelCommand(composemain.TopLevelCommand):
-        __doc__ = composemain.TopLevelCommand.__doc__.replace(
-            'docker-compose', "hyper-compose").replace(
+        __doc__ = composemain.TopLevelCommand.__doc__.replace('docker-compose', "hyper-compose").replace(
             "Options:\n", "Options:\n" + additional_options)
 
     command.get_client = get_client

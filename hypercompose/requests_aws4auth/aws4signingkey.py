@@ -7,7 +7,6 @@ authentication version 4 signing keys.
 # Licensed under the MIT License:
 # http://opensource.org/licenses/MIT
 
-
 from __future__ import unicode_literals
 
 import hashlib
@@ -43,8 +42,7 @@ class AWS4SigningKey:
 
     """
 
-    def __init__(self, secret_key, region, service, date=None,
-                 store_secret_key=True):
+    def __init__(self, secret_key, region, service, date=None, store_secret_key=True):
         """
         >>> AWS4SigningKey(secret_key, region, service[, date]
         ...                [, store_secret_key])
@@ -88,18 +86,13 @@ class AWS4SigningKey:
         self.region = region
         self.service = service
         self.date = date or datetime.utcnow().strftime('%Y%m%d')
-        self.scope = '{}/{}/{}/hyper_request'.format(
-                                            self.date,
-                                            self.region,
-                                            self.service)
+        self.scope = '{}/{}/{}/hyper_request'.format(self.date, self.region, self.service)
         self.store_secret_key = store_secret_key
         self.secret_key = secret_key if self.store_secret_key else None
-        self.key = self.generate_key(secret_key, self.region,
-                                     self.service, self.date)
+        self.key = self.generate_key(secret_key, self.region, self.service, self.date)
 
     @classmethod
-    def generate_key(cls, secret_key, region, service, date,
-                     intermediates=False):
+    def generate_key(cls, secret_key, region, service, date, intermediates=False):
         """
         Generate the signing key string as bytes.
 
@@ -139,6 +132,6 @@ class AWS4SigningKey:
     @property
     def amz_date(self):
         msg = ("This attribute has been renamed to 'date'. 'amz_date' is "
-             "deprecated and will be removed in a future version.")
+               "deprecated and will be removed in a future version.")
         warn(msg, DeprecationWarning)
         return self.date

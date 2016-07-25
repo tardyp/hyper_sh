@@ -19,7 +19,6 @@ authentication with the Requests module.
 # Licensed under the MIT License:
 # http://opensource.org/licenses/MIT
 
-
 from __future__ import unicode_literals
 
 import binascii
@@ -41,7 +40,6 @@ try:
 except ImportError:
     from urlparse import urlparse, parse_qs
     from urllib import quote, unquote
-
 
 
 class AWS4Auth(AuthBase):
@@ -272,12 +270,10 @@ class AWS4Auth(AuthBase):
         self.session_token = kwargs.get('session_token')
         if self.session_token:
             self.default_include_headers.append('x-hyper-security-token')
-        self.include_hdrs = kwargs.get('include_hdrs',
-                                       self.default_include_headers)
+        self.include_hdrs = kwargs.get('include_hdrs', self.default_include_headers)
         AuthBase.__init__(self)
 
-    def regenerate_signing_key(self, secret_key=None, region=None,
-                               service=None, date=None):
+    def regenerate_signing_key(self, secret_key=None, region=None, service=None, date=None):
         """
         Regenerate the signing key for this instance. Store the new key in
         signing_key property.
@@ -301,8 +297,7 @@ class AWS4Auth(AuthBase):
 
         """
         region = "us-west-1"
-        if secret_key is None and (self.signing_key is None or
-                                   self.signing_key.secret_key is None):
+        if secret_key is None and (self.signing_key is None or self.signing_key.secret_key is None):
             raise NoSecretKeyError
 
         secret_key = secret_key or self.signing_key.secret_key
@@ -314,8 +309,7 @@ class AWS4Auth(AuthBase):
         else:
             store_secret_key = self.signing_key.store_secret_key
 
-        self.signing_key = AWS4SigningKey(secret_key, region, service, date,
-                                          store_secret_key)
+        self.signing_key = AWS4SigningKey(secret_key, region, service, date, store_secret_key)
 
         self.region = region
         self.service = service
@@ -366,15 +360,13 @@ class AWS4Auth(AuthBase):
         # generate signature
         result = self.get_canonical_headers(req, self.include_hdrs)
         cano_headers, signed_headers = result
-        cano_req = self.get_canonical_request(req, cano_headers,
-                                              signed_headers)
+        cano_req = self.get_canonical_request(req, cano_headers, signed_headers)
         sig_string = self.get_sig_string(req, cano_req, self.signing_key.scope)
         sig_string = sig_string.encode('utf-8')
         hsh = hmac.new(self.signing_key.key, sig_string, hashlib.sha256)
         sig = hsh.hexdigest()
         auth_str = 'HYPER-HMAC-SHA256 '
-        auth_str += 'Credential={}/{}, '.format(self.access_id,
-                                                self.signing_key.scope)
+        auth_str += 'Credential={}/{}, '.format(self.access_id, self.signing_key.scope)
         auth_str += 'SignedHeaders={}, '.format(signed_headers)
         auth_str += 'Signature={}'.format(sig)
         req.headers['Authorization'] = auth_str
@@ -428,8 +420,7 @@ class AWS4Auth(AuthBase):
         date_str -- Str containing a date and optional time
 
         """
-        months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug',
-                  'sep', 'oct', 'nov', 'dec']
+        months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
         formats = {
             # RFC 7231, e.g. 'Mon, 09 Sep 2011 23:36:00 GMT'
             r'^(?:\w{3}, )?(\d{2}) (\w{3}) (\d{4})\D.*$':
@@ -506,8 +497,7 @@ class AWS4Auth(AuthBase):
                 req.body = req.body.encode(cs)
             else:
                 ct = split[0]
-                if (ct == 'application/x-www-form-urlencoded' or
-                        'x-hyper-' in ct):
+                if (ct == 'application/x-www-form-urlencoded' or 'x-hyper-' in ct):
                     req.body = req.body.encode()
                 else:
                     req.body = req.body.encode('utf-8')
@@ -533,8 +523,7 @@ class AWS4Auth(AuthBase):
         qs = split[1] if len(split) == 2 else ''
         qs = self.amz_cano_querystring(qs)
         payload_hash = req.headers['x-hyper-content-sha256']
-        req_parts = [req.method.upper(), path, qs, cano_headers,
-                     signed_headers, payload_hash]
+        req_parts = [req.method.upper(), path, qs, cano_headers, signed_headers, payload_hash]
         cano_req = '\n'.join(req_parts)
         return cano_req
 
@@ -577,9 +566,8 @@ class AWS4Auth(AuthBase):
         for hdr, val in headers.items():
             hdr = hdr.strip().lower()
             val = cls.amz_norm_whitespace(val).strip()
-            if (hdr in include or '*' in include or
-                    ('x-hyper-*' in include and hdr.startswith('x-hyper-') and not
-                    hdr == 'x-hyper-client-context')):
+            if (hdr in include or '*' in include or ('x-hyper-*' in include and hdr.startswith('x-hyper-') and
+                                                     not hdr == 'x-hyper-client-context')):
                 vals = cano_headers_dict.setdefault(hdr, [])
                 vals.append(val)
         # Flatten cano_headers dict to string and generate signed_headers

@@ -20,8 +20,8 @@ class Hyper(Client):
         url = urlparse.urlparse(url)
         base_url = "https://" + url.netloc
         Client.__init__(self, base_url, tls=True)
-        self.auth = AWS4Auth(self.creds['accesskey'], self.creds['secretkey'],
-                             url.netloc.split(".")[0], 'hyper')
+        self.auth = AWS4Auth(self.creds['accesskey'], self.creds['secretkey'], url.netloc.split(".")[0],
+                             'hyper')
         self._version = "1.23"
 
     def create_network(*arg, **kw):
