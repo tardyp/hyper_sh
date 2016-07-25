@@ -1,10 +1,17 @@
+from __future__ import print_function
+
 import json
 import os
-import urlparse
 
 from docker import Client
 
 from .requests_aws4auth import AWS4Auth
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
 
 DEFAULT_CONFIG_FILE = "~/.hyper/config.json"
 
@@ -32,15 +39,15 @@ class Hyper(Client):
     def __init__(self, config=None):
         if config is None:
             config = self.guess_config()
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             self.config = json.load(open(os.path.expanduser(config)))
         else:
             self.config = config
-        clouds = self.config['clouds'].items()
+        clouds = list(self.config['clouds'].items())
         if len(clouds) != 1:
             raise RuntimeError("supports only one cloud in config")
         url, self.creds = clouds[0]
-        url = urlparse.urlparse(url)
+        url = urlparse(url)
         base_url = "https://" + url.netloc
         Client.__init__(self, base_url, tls=True)
         self.auth = AWS4Auth(self.creds['accesskey'], self.creds['secretkey'], url.netloc.split(".")[0],

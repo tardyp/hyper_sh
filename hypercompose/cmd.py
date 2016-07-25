@@ -1,6 +1,8 @@
+from __future__ import print_function
+
 from compose import service, volume
 
-from api import Hyper
+from .api import Hyper
 
 hyperconfig = None
 orig_project_from_options = None
@@ -10,7 +12,7 @@ def project_from_options(project_dir, options):
     global hyperconfig, orig_project_from_options
     if "hyperconfig" in options:
         hyperconfig = options.get("--hyperconfig")
-        print "using hyper config", hyperconfig
+        print("using hyper config", hyperconfig)
     return orig_project_from_options(project_dir, options)
 
 # monkey-patch docker-compose to adapt it to hyper
@@ -25,7 +27,8 @@ class HyperService(DockerService):
                                                               previous_container)
         if 'networking_config' in options:
             del options['networking_config']
-        options['host_config']['Binds'] = map(lambda x: x.replace(":rw", ""), options['host_config']['Binds'])
+        options['host_config']['Binds'] = list(map(
+            lambda x: x.replace(":rw", ""), options['host_config']['Binds']))
         if number > 1:
             options['hostname'] = self.name + str(self.number)
         else:
