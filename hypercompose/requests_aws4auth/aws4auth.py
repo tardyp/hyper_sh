@@ -21,7 +21,6 @@ authentication with the Requests module.
 
 from __future__ import unicode_literals
 
-import binascii
 import datetime
 import hashlib
 import hmac
@@ -146,6 +145,7 @@ class AWS4Auth(AuthBase):
     occur, instantiate the instance using an AWS4Signing key which was created
     with the store_secret_key parameter set to False:
 
+    >>> secret_key, region, service, date, access_id = ()
     >>> sig_key = AWS4SigningKey(secret_key, region, service, date, False)
     >>> auth = StrictAWS4Auth(access_id, sig_key)
 
@@ -192,12 +192,6 @@ class AWS4Auth(AuthBase):
         AWS4Auth instances can be created by supplying key scope parameters
         directly or by using an AWS4SigningKey instance:
 
-        >>> auth = AWS4Auth(access_id, secret_key, region, service
-        ...                 [, date][, raise_invalid_date=False][, session_token=None])
-
-          or
-
-        >>> auth = AWS4Auth(access_id, signing_key[, raise_invalid_date=False])
 
         access_id   -- This is your AWS access ID
         secret_key  -- This is your AWS secret access key
@@ -338,8 +332,10 @@ class AWS4Auth(AuthBase):
         if req_date is None:
             # no date headers or none in recognisable format
             # replace them with x-amz-header with current date and time
-            if 'date' in req.headers: del req.headers['date']
-            if 'x-hyper-date' in req.headers: del req.headers['x-hyper-date']
+            if 'date' in req.headers:
+                del req.headers['date']
+            if 'x-hyper-date' in req.headers:
+                del req.headers['x-hyper-date']
             now = datetime.datetime.utcnow()
             req_date = now.date()
             req.headers['x-hyper-date'] = now.strftime('%Y%m%dT%H%M%SZ')
@@ -695,9 +691,6 @@ class StrictAWS4Auth(AWS4Auth):
     Keys will still store the secret key by default. If this is not desired
     then create the instance by passing an AWS4SigningKey created with
     store_secret_key set to False to the StrictAWS4AUth constructor:
-
-    >>> sig_key = AWS4SigningKey(secret_key, region, service, date, False)
-    >>> auth = StrictAWS4Auth(access_id, sig_key)
 
     """
 

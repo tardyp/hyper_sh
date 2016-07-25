@@ -203,8 +203,7 @@ Unsupported AWS features / todo
 from .aws4auth import AWS4Auth, StrictAWS4Auth, PassiveAWS4Auth
 from .aws4signingkey import AWS4SigningKey
 from .exceptions import RequestsAws4AuthException, DateMismatchError, NoSecretKeyError
-del aws4auth
-del aws4signingkey
-del exceptions
 
+[AWS4Auth, StrictAWS4Auth, PassiveAWS4Auth, AWS4SigningKey, RequestsAws4AuthException,
+ DateMismatchError, NoSecretKeyError]
 __version__ = '0.9'
