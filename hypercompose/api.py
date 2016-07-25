@@ -48,7 +48,7 @@ class Hyper(Client):
         self._version = "1.23"
 
     def create_network(*arg, **kw):
-        #ignore network creation
+        # ignore network creation
         pass
 
     def events(self, *args, **kw):
