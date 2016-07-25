@@ -6,9 +6,32 @@ from docker import Client
 
 from .requests_aws4auth import AWS4Auth
 
+DEFAULT_CONFIG_FILE = "~/.hyper/config.json"
+
 
 class Hyper(Client):
-    def __init__(self, config):
+    @staticmethod
+    def guess_config():
+        default_config_file = os.path.expanduser(DEFAULT_CONFIG_FILE)
+        if os.path.exists(default_config_file):
+            config = default_config_file
+        elif ('hyper_accesskey' in os.environ and 'hyper_secretkey' in os.environ and
+              'hyper_endpoint' in os.environ):
+            config = {
+                'clouds': {
+                    os.environ['hyper_endpoint']: {
+                        "accesskey": os.environ['hyper_accesskey'],
+                        "secretkey": os.environ['hyper_secretkey']
+                    }
+                }
+            }
+        else:
+            raise RuntimeError("unable to guess config from default file or environment")
+        return config
+
+    def __init__(self, config=None):
+        if config is None:
+            config = self.guess_config()
         if isinstance(config, basestring):
             self.config = json.load(open(os.path.expanduser(config)))
         else:
@@ -27,3 +50,6 @@ class Hyper(Client):
     def create_network(*arg, **kw):
         #ignore network creation
         pass
+
+    def events(self, *args, **kw):
+        return []

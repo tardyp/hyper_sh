@@ -2,7 +2,7 @@ from compose import service, volume
 
 from api import Hyper
 
-hyperconfig = "~/.hyper/config.json"
+hyperconfig = None
 orig_project_from_options = None
 
 
@@ -23,7 +23,8 @@ class HyperService(DockerService):
     def _get_container_create_options(self, override_options, number, one_off=False, previous_container=None):
         options = DockerService._get_container_create_options(self, override_options, number, one_off,
                                                               previous_container)
-        del options['networking_config']
+        if 'networking_config' in options:
+            del options['networking_config']
         options['host_config']['Binds'] = map(lambda x: x.replace(":rw", ""), options['host_config']['Binds'])
         if number > 1:
             options['hostname'] = self.name + str(self.number)
