@@ -204,6 +204,6 @@ from .aws4auth import AWS4Auth, StrictAWS4Auth, PassiveAWS4Auth
 from .aws4signingkey import AWS4SigningKey
 from .exceptions import RequestsAws4AuthException, DateMismatchError, NoSecretKeyError
 
-[AWS4Auth, StrictAWS4Auth, PassiveAWS4Auth, AWS4SigningKey, RequestsAws4AuthException,
- DateMismatchError, NoSecretKeyError]
+[AWS4Auth, StrictAWS4Auth, PassiveAWS4Auth, AWS4SigningKey, RequestsAws4AuthException, DateMismatchError,
+ NoSecretKeyError]
 __version__ = '0.9'
