@@ -1,49 +1,47 @@
-Hyper-Compose
-=============
+Hyper_sh
+========
 
-Command line utility which installs docker-compose application into the hyper.sh cloud
+docker-py adapted to Hyper
 
+It uses underscore '_' instead of '-' in its name like the original `Hyper_` service, but you can actually install either spelling.
 
-As Hyper is (loosly) based on the docker-api, we can re-use docker-compose and docker-py, but hack out the network part to use the authentication stuff from hyper
-
-
-POC
-===
-
-This project is more a PoC. Some features of docker-compose are not working
-
-- Networking configuration
-- container re-creation (they need to be removed, and the created again)
-- IP affectation (you will need to use original hyper command line in order to affect public IP addresses to your containers)
-
-Future plans
-============
-
-The official hyper-compose functionality from hyper crew will come later with better integration to the hyper system.
-It will be directly integrated into the "hyper" command line utility, and will be implemented mostly server side, to provide better coordination, and status monitoring.
+This is a thin adaptation layer of docker-py for it to work with Hyper's credential scheme
 
 Install from pip
 ================
 
 ::
 
-    pip install hyper-compose
+    pip install hyper_py
 
-How to develop
-==============
+How to use
+==========
 
-Setup virtualenv in order to install all dependencies::
+hyper_sh is used with the same API as docker-py
 
-    virtualenv sandbox
-    . ./sandbox/bin/activate
-    pip install -U pip
-    pip install -e .
+::
+    from hyper_sh import client
+    c = Client()  # without argument, config is guessed by reading ~/.hyper/config.json
+    print c.images()
 
-Now you have ``hyper-compose`` in your path, and you can use it like docker compose::
+::
+    from hyper_sh import client
+    c = Client("path/to/config.json")  # you can pass a specific config.json
+    print c.images()
 
-    cd path/to/composeyml
-    hyper-compose up
-    hyper-compose stop
-    hyper-compose rm
+::
+    from hyper_sh import client
+    c = Client({'clouds': {
+        os.environ['hyper_endpoint']: {
+            "accesskey": os.environ['hyper_accesskey'],
+            "secretkey": os.environ['hyper_secretkey']
+        }
+    }})  # or you can give the content of a config.json directly
+    print c.images()
 
-Note that you still need to use hyper command line in order to associate floating IP to your containers
+API
+===
+At the moment, hyper_sh maps 1:1 to the api of docker-py, which means that some api will not work, as they are not supported by `Hyper_`.
+
+There are some other API supported by `Hyper_` that are not yet supported by this module (i.e. fip managment).
+Patches are welcome.

@@ -1,20 +1,16 @@
-import os
-import subprocess
 from unittest.case import SkipTest
 
-from hypercompose.api import Hyper
+from hyper_sh import Client
 
 
 def assertSetup():
     try:
-        Hyper.guess_config()
+        Client.guess_config()
     except RuntimeError:
         raise SkipTest("no default config is detected")
 
 
-def test_simple_compose():
+def test_list_images():
     assertSetup()
-    cwd = os.path.dirname(__file__)
-    subprocess.check_call(["hyper-compose", "up", '-d'], cwd=cwd)
-    subprocess.check_call(["hyper-compose", "down"], cwd=cwd)
-    subprocess.check_call(["hyper-compose", "rm"], cwd=cwd)
+    c = Client()  # guess config
+    assert len(c.images()) != 0
