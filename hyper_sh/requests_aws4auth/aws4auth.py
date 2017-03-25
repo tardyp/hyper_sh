@@ -676,6 +676,8 @@ class AWS4Auth(AuthBase):
         Ignore text enclosed in quotes.
 
         """
+        if isinstance(text, bytes):
+            text = text.decode()
         return ' '.join(shlex.split(text, posix=False))
 
 

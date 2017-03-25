@@ -12,5 +12,5 @@ def assertSetup():
 
 def test_list_images():
     assertSetup()
-    c = Client()  # guess config
+    c = Client("~/.hyper/config.json")  # guess config
     assert len(c.images()) != 0
