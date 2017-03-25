@@ -353,6 +353,12 @@ class AWS4Auth(AuthBase):
         if self.session_token:
             req.headers['x-hyper-security-token'] = self.session_token
 
+        # force required headers
+        if 'Content-Type' not in req.headers:
+            req.headers['Content-Type'] = 'application/json'
+        if 'host' not in req.headers:
+            req.headers['host'] = urlparse(req.url).netloc.split(':')[0]
+
         # generate signature
         result = self.get_canonical_headers(req, self.include_hdrs)
         cano_headers, signed_headers = result
@@ -366,8 +372,6 @@ class AWS4Auth(AuthBase):
         auth_str += 'SignedHeaders={}, '.format(signed_headers)
         auth_str += 'Signature={}'.format(sig)
         req.headers['Authorization'] = auth_str
-        req.headers['Content-Type'] = 'application/json'
-        req.headers['host'] = urlparse(req.url).netloc.split(':')[0]
 
         return req
 
@@ -521,6 +525,7 @@ class AWS4Auth(AuthBase):
         payload_hash = req.headers['x-hyper-content-sha256']
         req_parts = [req.method.upper(), path, qs, cano_headers, signed_headers, payload_hash]
         cano_req = '\n'.join(req_parts)
+        print(cano_req)
         return cano_req
 
     @classmethod
@@ -546,13 +551,7 @@ class AWS4Auth(AuthBase):
             include = cls.default_include_headers
         include = [x.lower() for x in include]
         headers = req.headers.copy()
-        # Temporarily include the host header - AWS requires it to be included
-        # in the signed headers, but Requests doesn't include it in a
-        # PreparedRequest
-        if 'Content-Type' not in headers:
-            headers["Content-Type"] = "application/json"
-        if 'host' not in headers:
-            headers['host'] = urlparse(req.url).netloc.split(':')[0]
+
         # Aggregate for upper/lowercase header name collisions in header names,
         # AMZ requires values of colliding headers be concatenated into a
         # single header with lowercase name.  Although this is not possible with

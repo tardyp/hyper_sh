@@ -12,5 +12,12 @@ def assertSetup():
 
 def test_list_images():
     assertSetup()
-    c = Client("~/.hyper/config.json")  # guess config
+    c = Client()  # guess config
     assert len(c.images()) != 0
+
+
+def test_create_container():
+    assertSetup()
+    c = Client()  # guess config
+    cid = c.create_container("busybox")
+    c.remove_container(cid, force=True)
