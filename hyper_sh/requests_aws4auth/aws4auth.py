@@ -525,7 +525,6 @@ class AWS4Auth(AuthBase):
         payload_hash = req.headers['x-hyper-content-sha256']
         req_parts = [req.method.upper(), path, qs, cano_headers, signed_headers, payload_hash]
         cano_req = '\n'.join(req_parts)
-        print(cano_req)
         return cano_req
 
     @classmethod
