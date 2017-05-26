@@ -3,7 +3,10 @@ from __future__ import print_function
 import json
 import os
 
-from docker import APIClient as DockerClient
+try:
+    from docker import APIClient as DockerClient
+except ImportError:
+    from docker import Client as DockerClient
 
 from .requests_aws4auth import AWS4Auth
 
